@@ -2,7 +2,7 @@ import cv2
 from model.hand_detector import MediaPipeDetector
 from model.gesture_classifier import GestureClassifier
 from model.text_engine import TextEngine
-from view.opencv_view import OpenCVView
+from view.opencv_view import OpenCV_View
 from service.audio_service import AudioService
 
 class MainController:
@@ -11,7 +11,7 @@ class MainController:
         self.detector = MediaPipeDetector()
         self.classifier = GestureClassifier()
         self.text_engine = TextEngine()
-        self.view = OpenCVView(window_name="Gesture Flow v2.0")
+        self.view = OpenCV_View(window_name="Gesture Flow v2.0")
         self.audio_service = AudioService()
         self.audio_service.speak("Sistema iniciado")
 

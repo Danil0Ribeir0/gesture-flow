@@ -1,4 +1,4 @@
-from src.utils.gesture_enums import HandGesture
+from utils.gesture_enums import HandGesture
 import time
 
 class TextEngine:
@@ -6,9 +6,9 @@ class TextEngine:
         self.current_sentence = ""
         self.last_gesture = None
         self.frame_count = 0
-        self.confirm_threshold = 15
+        self.confirm_threshold = 10
         self.last_added_time = 0
-        self.cooldown_seconds = 2.0
+        self.cooldown_seconds = 1.0
 
     def process_gesture(self, gesture: HandGesture):
         if gesture == HandGesture.UNKNOWN:
