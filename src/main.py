@@ -1,32 +1,53 @@
 # src/main.py
 import cv2
+import time
 from model.hand_detector import MediaPipeDetector
+from model.gesture_classifier import GestureClassifier
 
 def main():
-    # 1. Instancia nosso Detector (Model)
+    # Instancia Models
     detector = MediaPipeDetector()
+    classifier = GestureClassifier()
     
-    # 2. Abre a Webcam (0 geralmente é a câmera padrão)
     cap = cv2.VideoCapture(0)
     
-    print("Iniciando Gesture Flow... Pressione 'q' para sair.")
-    
+    print("Iniciando Gesture Flow...")
+
     while cap.isOpened():
         success, frame = cap.read()
         if not success:
-            print("Ignorando frame vazio da câmera.")
             continue
 
-        # 3. Usa nossa classe para processar a IA
+        # 1. Detectar Mão
         results = detector.process_frame(frame)
         
-        # 4. Desenha o esqueleto (só para visualizarmos se funcionou)
-        frame = detector.draw_landmarks(frame, results)
+        gesture_name = ""
 
-        # Espelha a imagem para ficar mais natural (como um espelho)
-        cv2.imshow('Gesture Flow - Teste de Model', cv2.flip(frame, 1))
+        # 2. Se achou mão, classificar gesto
+        if results.multi_hand_landmarks:
+            for hand_landmarks in results.multi_hand_landmarks:
+                # Extrai a lista de landmarks
+                landmarks_list = hand_landmarks.landmark
+                
+                # Classifica
+                gesture_enum = classifier.process(landmarks_list)
+                gesture_name = gesture_enum.value
 
-        # Sai se apertar 'q'
+                # Desenha o esqueleto
+                detector.draw_landmarks(frame, results)
+
+        # 3. Desenhar interface (Texto na tela)
+        # Espelha o frame (flip) para ficar natural
+        frame = cv2.flip(frame, 1)
+        
+        # Escreve o texto do gesto (Atenção: como demos flip, desenhamos depois)
+        if gesture_name:
+            cv2.rectangle(frame, (10, 10), (300, 60), (0, 0, 0), -1) # Fundo preto pro texto
+            cv2.putText(frame, gesture_name, (20, 50), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+        cv2.imshow('Gesture Flow - Fase 3', frame)
+
         if cv2.waitKey(5) & 0xFF == ord('q'):
             break
             
